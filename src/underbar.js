@@ -177,6 +177,11 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = function(collection, iterator, accumulator) {
+    // functionality to account for objects as collection
+    if (collection.length === undefined) {
+      collection = Object.values(collection);
+    }
+
     var acc = accumulator;
     if (acc === undefined) {
       acc = collection[0];
@@ -198,6 +203,7 @@
   _.contains = function(collection, target) {
     // TIP: Many iteration problems can be most easily expressed in
     // terms of reduce(). Here's a freebie to demonstrate!
+    
     return _.reduce(collection, function(wasFound, item) {
       if (wasFound) {
         return true;
@@ -210,12 +216,43 @@
   // Determine whether all of the elements match a truth test.
   _.every = function(collection, iterator) {
     // TIP: Try re-using reduce() here.
+
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+    return _.reduce(collection, function(truth, item) {
+      if (truth === false) {
+        return false;
+      }
+      if (iterator(item)) {
+        return true;
+      } else {
+        return false;
+      }
+    }, true);
   };
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
-  _.some = function(collection, iterator) {
+ _.some = function(collection, iterator) {
     // TIP: There's a very clever way to re-use every() here.
+    if (iterator === undefined) {
+      iterator = _.identity;
+    }
+
+    var isFalse = function(item) {
+      if (iterator(item)) {
+        return false;
+      } else {
+        return true;
+      }
+    }
+
+    if (_.every(collection, isFalse)) {
+      return false;
+    } else {
+      return true;
+    }
   };
 
 
@@ -238,11 +275,31 @@
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
   _.extend = function(obj) {
+    var dest = arguments[0];
+    console.log(dest);
+    console.log(arguments.length);
+    _.each(arguments, function(object) {
+      _.each(object, function(value, key) {
+        dest[key] = value;
+      })
+    })
+    return dest;
   };
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
   _.defaults = function(obj) {
+    var dest = arguments[0];
+    console.log(dest);
+    console.log(arguments.length);
+    _.each(arguments, function(object) {
+      _.each(object, function(value, key) {
+        if (dest[key] === undefined) {
+          dest[key] = value;
+        }
+      })
+    })
+    return dest;
   };
 
 
