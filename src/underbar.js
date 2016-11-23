@@ -290,8 +290,6 @@
   // exists in obj
   _.defaults = function(obj) {
     var dest = arguments[0];
-    console.log(dest);
-    console.log(arguments.length);
     _.each(arguments, function(object) {
       _.each(object, function(value, key) {
         if (dest[key] === undefined) {
@@ -343,6 +341,19 @@
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var called = {};
+
+    return function() {
+      // need to create array variable to represent arguments to be passed in
+      var arg = [...arguments];
+      if (Array.isArray(arg[0])) {
+       arg.push("a"); // tags if arg is already an array vs. list
+      }
+      if (!called[arg]) {
+        called[arg] = func.apply(this, arg);
+      }
+      return called[arg];
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
@@ -352,6 +363,11 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    // need to create array variable to represent arguments to ultimately be passed in
+    var arg = [...arguments].slice(2, arguments.length);
+    setTimeout(function() {
+      return func.apply(this, arg);
+    }, wait);
   };
 
 
@@ -366,6 +382,16 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    // just going to reduce to a new array accumulator vs. slicing
+    return _.reduce(array, function(arr, item) {
+      var frontOrBack = Math.round(Math.random());
+      if (frontOrBack === 0) {
+        arr.unshift(item);
+      } else {
+        arr.push(item);
+      }
+      return arr;
+    }, []);
   };
 
 
